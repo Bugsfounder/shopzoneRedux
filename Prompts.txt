@@ -1,0 +1,5 @@
+what is useMemo
+what is useCallback
+how to implement useMemo easiest way
+how to implement useCallback easiest way to implement
+how to use Redux DevTools extension
