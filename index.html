@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Particle Text Animation</title>
+<style>
+    body {
+        margin: 0;
+        background: black;
+        overflow: hidden;
+    }
+    canvas {
+        display: block;
+    }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const particles = [];
+const numParticles = 1500;
+
+// === TEXT YOU WANT ===
+const text = "RAJA JI";
+
+// === STEP 1: CREATE TARGET POINTS FROM TEXT ===
+const offCanvas = document.createElement("canvas");
+const offCtx = offCanvas.getContext("2d");
+
+offCanvas.width = canvas.width;
+offCanvas.height = canvas.height;
+
+// --- Dynamic font scaling ---
+let fontSize = 300;
+offCtx.font = `bold ${fontSize}px Arial`;
+
+while (offCtx.measureText(text).width > canvas.width * 0.8) {
+    fontSize -= 10;
+    offCtx.font = `bold ${fontSize}px Arial`;
+}
+
+offCtx.fillStyle = "white";
+offCtx.textAlign = "center";
+
+// --- Correct vertical centering ---
+const metrics = offCtx.measureText(text);
+const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+
+const x = offCanvas.width / 2;
+const y = (offCanvas.height / 2) + (textHeight / 2) - metrics.actualBoundingBoxDescent;
+
+offCtx.textBaseline = "alphabetic";
+offCtx.fillText(text, x, y);
+
+// Get pixel data
+const imageData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
+const data = imageData.data;
+
+const targetPoints = [];
+
+for (let y = 0; y < offCanvas.height; y += 4) {
+    for (let x = 0; x < offCanvas.width; x += 4) {
+        const index = (y * offCanvas.width + x) * 4;
+        if (data[index + 3] > 128) {
+            targetPoints.push({ x, y });
+        }
+    }
+}
+
+// === PARTICLE CLASS ===
+class Particle {
+    constructor(target) {
+        const side = Math.floor(Math.random() * 4);
+
+        if (side === 0) {
+            this.x = Math.random() * canvas.width;
+            this.y = -50;
+        } else if (side === 1) {
+            this.x = Math.random() * canvas.width;
+            this.y = canvas.height + 50;
+        } else if (side === 2) {
+            this.x = -50;
+            this.y = Math.random() * canvas.height;
+        } else {
+            this.x = canvas.width + 50;
+            this.y = Math.random() * canvas.height;
+        }
+
+        this.targetX = target.x;
+        this.targetY = target.y;
+
+        this.vx = 0;
+        this.vy = 0;
+        this.size = 2;
+    }
+
+    update() {
+        let dx = this.targetX - this.x;
+        let dy = this.targetY - this.y;
+
+        this.vx += dx * 0.01;
+        this.vy += dy * 0.01;
+
+        this.vx *= 0.85;
+        this.vy *= 0.85;
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // subtle alive motion
+        this.x += Math.sin(Date.now() * 0.002 + this.x) * 0.3;
+        this.y += Math.cos(Date.now() * 0.002 + this.y) * 0.3;
+    }
+
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = "white";
+        ctx.fill();
+    }
+}
+
+// === INIT PARTICLES ===
+for (let i = 0; i < targetPoints.length && i < numParticles; i++) {
+    particles.push(new Particle(targetPoints[i]));
+}
+
+// === ANIMATION ===
+function animate() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach(p => {
+        p.update();
+        p.draw();
+    });
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import ProductGrid from '@/components/ProductGrid';
+import RandomQuote from '@/components/RandomQuote';
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
             <p className="text-gray-500 dark:text-gray-400">
               Browse our latest collection of premium items.
             </p>
+            <RandomQuote />
           </div>
           <ProductGrid />
         </div>
