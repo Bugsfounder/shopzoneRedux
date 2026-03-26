@@ -1,7 +1,9 @@
 # ShopZone - Week 10 E-Commerce Upgrade
 
 This is a modern E-Commerce frontend application built with **Next.js**, **Tailwind CSS**, and **Redux Toolkit** to fulfill the requirements of the Week 10 Frontend specialization. The application demonstrates advanced global state management, render optimizations, and a clean, human-designed aesthetic.
-[vercel live](https://vercel.com/manisha-kumaris-projects-9b122fdd/shopzone-redux)
+
+[vercel live](https://shopzone-redux-eight.vercel.app/)
+
 ## Features
 
 - **Global Store (Redux Toolkit)**: A centralized store handling complex cross-component data without prop-drilling.
